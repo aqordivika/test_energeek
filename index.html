@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test Energeek: Vika</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" type="text/css" href="css/multi-select.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Firefox */
+        
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body class="hold-transition">
+
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">Quick Example</h3>
+                                </div>
+                                <form>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label>Jabatan</label>
+                                            <select class="form-control" id="jabatan">
+                                            </select>
+                                        </div>
+
+                                        <!-- Telepon -->
+                                        <label for="exampleInputTelepon">Telepon </label>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="exampleInputTelepon" placeholder="Enter Phone">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Email -->
+                                        <label for="exampleInputEmail1">Email </label>
+                                        <div class="input-group mb-3">
+                                            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tahun Lahir -->
+                                        <label for="exampleInputTahunLahir">Tahun Lahir </label>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="exampleInputTahunLahir" placeholder="Enter Year">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Skill Set</label>
+                                            <select id='pre-selected-options' multiple='multiple'>
+                                                <!-- <option value='elem_1' selected>elem 1</option>
+                                                <option value='elem_2'>elem 2</option> -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button type="submit" class="btn btn-primary" onclick="kirim()">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <pre id="test"></pre>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="js/jquery.multi-select.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var url = ["http://demo73.energeek.co.id/energeek-frontend-test/public/api/select_list/job?search", "http://demo73.energeek.co.id/energeek-frontend-test/public/api/select_list/skill?search="];
+            $.ajax({
+                datatype: 'json',
+                url: url[0],
+                success: function(datas) {
+                    console.log(datas.data.jobs);
+                    let arr = datas.data.jobs;
+                    for (let i = 0; i < arr.length; i++) {
+                        let jobId = datas.data.jobs[i].id;
+                        let jobName = JSON.stringify(datas.data.jobs[i].name).replaceAll(`"`, '');
+                        $(`#jabatan`).append("<option value='" + jobId + "'>" + jobName + "</option>");
+                    }
+                }
+            });
+            $.ajax({
+                datatype: 'json',
+                url: url[1],
+                success: function(datas) {
+                    console.log(datas);
+                    let arr = datas.data.skills;
+                    for (let i = 0; i < arr.length; i++) {
+                        let skillsId = datas.data.skills[i].id;
+                        let skillsName = JSON.stringify(datas.data.skills[i].name).replaceAll(`"`, '');
+                        $(`#pre-selected-options`).append("<option value='" + skillsId + "'>" + skillsName + "</option>");
+                    }
+                    $('#pre-selected-options').multiSelect();
+                }
+            })
+        })
+
+
+        function kirim() {
+            let jabatan = $('#jabatan').val();
+            let telepon = $('#exampleInputTelepon').val();
+            let email = $('#exampleInputEmail1').val();
+            let tahunLahir = $('#exampleInputTahunLahir').val();
+            let skillSet = $('#pre-selected-options').val();
+
+            $.ajax({
+                method: 'POST',
+                url: 'http://demo73.energeek.co.id/energeek-frontend-test/public/api/recruitment',
+                data: {
+                    "name": "Vika Aqordi",
+                    "email": email,
+                    "phone": telepon,
+                    "birth_year": tahunLahir,
+                    "job_id": 1,
+                    "skill_id": [1]
+                },
+                success: function(response, textStatus, jqXHR) {
+                    alert(response, textStatus, jqXHR);
+                    console.log("===============")
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
